@@ -101,6 +101,23 @@ func (c *Client) Start(config *config.MOSNConfig) error {
 }
 ```
 
+## Инициализировать и запустить соединение xds
+adsClient.start() 
+```go
+func (adsClient *ADSClient) Start() {
+        // Постройте двустороннее соединение потока для grpc.
+	adsClient.StreamClient = adsClient.AdsConfig.GetStreamClient()
+	utils.GoWithRecover(func() {
+        // Аутентифицировать и начать передачу xds, а также настроить регулярную повторную передачу
+		adsClient.sendThread()
+	}, nil)
+	utils.GoWithRecover(func() {
+        // Примите выданные данные и выберите разные обработчики в зависимости от типа
+		adsClient.receiveThread()
+	}, nil)
+}
+```
+
 MOSN is a network proxy written in Golang. It can be used as a cloud-native network data plane, providing services with the following proxy functions:  multi-protocol, modular, intelligent, and secure. MOSN is the short name of Modular Open Smart Network-proxy. MOSN can be integrated with any Service Mesh which support xDS API. It also can be used as an independent Layer 4 or Layer 7 load balancer, API Gateway, cloud-native Ingress, etc.
 
 ## Features
