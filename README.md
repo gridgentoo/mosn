@@ -7,6 +7,63 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/mosn/mosn)](https://goreportcard.com/report/github.com/mosn/mosn)
 ![license](https://img.shields.io/badge/license-Apache--2.0-green.svg)
 
+### Анализ исходного кода модуля MOSN XDS.
+
+### XDS используется с pilot-discovery выполняет функцию обнаружения службы.
+
+** MOSN можно получить динамически через XDS API.
+- Listener，
+- Route，
+- Cluster， 
+- Endpoint,
+- Secret,
+- Конфигурация.
+
+Файл конфигурации MOSN mosn_config.json в режиме XDS:
+
+```json
+{
+  "dynamic_resources": {
+    "lds_config": {
+      "ads": {}
+    },
+    "cds_config": {
+      "ads": {}
+    },
+    "ads_config": {
+      "api_type": "GRPC",
+      "cluster_names": ["xxx"],
+      "grpc_services": [
+        {
+          "envoy_grpc": {
+            "cluster_name": "xds-grpc"
+          }
+        }
+      ]
+    }
+  },
+  "static_resources": {
+    "clusters": [
+      {
+        "name": "xds-grpc",
+        "type": "STRICT_DNS",
+        "lb_policy": "RANDOM",
+        "hosts": [
+          {
+            "socket_address": {"address": "istio-pilot.istio-system.svc.boss.twl", "port_value": 15010}
+          }
+        ],
+        "http2_protocol_options": { }
+      }
+    ]
+  }
+}
+```
+
+Проанализируйте файл конфигурации, чтобы создать XDSConfig (конфигурация клиента XDS).
+
+Создайте adsClient (клиент XDS).
+
 [中文](README_ZH.md)
 
 MOSN is a network proxy written in Golang. It can be used as a cloud-native network data plane, providing services with the following proxy functions:  multi-protocol, modular, intelligent, and secure. MOSN is the short name of Modular Open Smart Network-proxy. MOSN can be integrated with any Service Mesh which support xDS API. It also can be used as an independent Layer 4 or Layer 7 load balancer, API Gateway, cloud-native Ingress, etc.
