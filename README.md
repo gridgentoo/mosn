@@ -149,7 +149,30 @@ func HandleEnvoyListener(client *ADSClient, resp *envoy_api_v2.DiscoveryResponse
 	}
 }
 ```
+Детали функции:
+[https://github.com/mosn/mosn/blob/master/pkg/xds/v2/default_handler.go](https://github.com/mosn/mosn/blob/master/pkg/xds/v2/default_handler.go)
 
+Процесс запроса и обработки прост, как показано на рисунке, и также допускается запуск пилотного обнаружения pilot-discovery:
+
+```
+switch(type):
+  case: cluster:
+    Получить возврат кластера (cluster), запросить конечные точки (Endpoints) в соответствии с (clusterName)
+  case: endpoint:
+    Получение конечных точек (Endpoints), запрос слушателя (Listener)
+  case: listener
+    Принять слушателя(Listener), запросить маршруты(Routes)
+  case: router
+    Принять маршруты (Routes)
+       
+```
+Тип структуры данных XDS.pd находится в:
+[https://github.com/envoyproxy/go-control-plane](https://github.com/envoyproxy/go-control-plane)
+
+После получения данных и их десериализации в модель XDS выполняется преобразование структуры.
+
+Код преобразования типа следующий:
+[https://github.com/mosn/mosn/blob/master/pkg/xds/conv/convertxds.go](https://github.com/mosn/mosn/blob/master/pkg/xds/conv/convertxds.go)
 
 MOSN is a network proxy written in Golang. It can be used as a cloud-native network data plane, providing services with the following proxy functions:  multi-protocol, modular, intelligent, and secure. MOSN is the short name of Modular Open Smart Network-proxy. MOSN can be integrated with any Service Mesh which support xDS API. It also can be used as an independent Layer 4 or Layer 7 load balancer, API Gateway, cloud-native Ingress, etc.
 
