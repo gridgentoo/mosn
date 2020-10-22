@@ -118,6 +118,12 @@ func (adsClient *ADSClient) Start() {
 }
 ```
 
+Детали функции:
+[https://github.com/mosn/mosn/blob/master/pkg/xds/v2/adssubscriber.go](https://github.com/mosn/mosn/blob/master/pkg/xds/v2/adssubscriber.go)
+
+
+
+
 MOSN is a network proxy written in Golang. It can be used as a cloud-native network data plane, providing services with the following proxy functions:  multi-protocol, modular, intelligent, and secure. MOSN is the short name of Modular Open Smart Network-proxy. MOSN can be integrated with any Service Mesh which support xDS API. It also can be used as an independent Layer 4 or Layer 7 load balancer, API Gateway, cloud-native Ingress, etc.
 
 ## Features
