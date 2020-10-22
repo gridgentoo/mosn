@@ -121,7 +121,34 @@ func (adsClient *ADSClient) Start() {
 Детали функции:
 [https://github.com/mosn/mosn/blob/master/pkg/xds/v2/adssubscriber.go](https://github.com/mosn/mosn/blob/master/pkg/xds/v2/adssubscriber.go)
 
+## Обработка и отправка сообщений XDS
 
+Четыре типа регистрации процессора.
+
+```go
+func init() {
+	RegisterTypeURLHandleFunc(EnvoyListener, HandleEnvoyListener)
+	RegisterTypeURLHandleFunc(EnvoyCluster, HandleEnvoyCluster)
+	RegisterTypeURLHandleFunc(EnvoyClusterLoadAssignment, HandleEnvoyClusterLoadAssignment)
+	RegisterTypeURLHandleFunc(EnvoyRouteConfiguration, HandleEnvoyRouteConfiguration)
+}
+```
+Примите тип данных, преобразуйте тип XDS в тип данных MOSN и добавьте соответствующий менеджер.
+
+В качестве примера возьмем HandlerListener:
+```go
+func HandleEnvoyListener(client *ADSClient, resp *envoy_api_v2.DiscoveryResponse) {
+	log.DefaultLogger.Tracef("get lds resp,handle it")
+    //Разберите возвращенное сообщение и сгенерируйте envoy_listener
+	listeners := client.handleListenersResp(resp)
+	log.DefaultLogger.Infof("get %d listeners from LDS", len(listeners))
+    //Преобразуйте envoy_listener в mosn_listener и добавьте ListenerAdapter
+	conv.ConvertAddOrUpdateListeners(listeners)
+	if err := client.reqRoutes(client.StreamClient); err != nil {
+		log.DefaultLogger.Warnf("send thread request rds fail!auto retry next period")
+	}
+}
+```
 
 
 MOSN is a network proxy written in Golang. It can be used as a cloud-native network data plane, providing services with the following proxy functions:  multi-protocol, modular, intelligent, and secure. MOSN is the short name of Modular Open Smart Network-proxy. MOSN can be integrated with any Service Mesh which support xDS API. It also can be used as an independent Layer 4 or Layer 7 load balancer, API Gateway, cloud-native Ingress, etc.
