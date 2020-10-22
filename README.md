@@ -68,21 +68,21 @@
 ```go
 func (c *Client) Start(config *config.MOSNConfig) error {
 	log.DefaultLogger.Infof("xds client start")
-    //解析配置文件
+    //Разобрать файл конфигурации
 	dynamicResources, staticResources, err := UnmarshalResources(config)
 	if err != nil {
 		log.DefaultLogger.Warnf("fail to unmarshal xds resources, skip xds: %v", err)
 		return errors.New("fail to unmarshal xds resources")
 	}
     
-    //构建xdsConfig
+    //Создайте xdsConfig
 	xdsConfig := v2.XDSConfig{}
 	err = xdsConfig.Init(dynamicResources, staticResources)
 	if err != nil {
 		log.DefaultLogger.Warnf("fail to init xds config, skip xds: %v", err)
 		return errors.New("fail to init xds config")
 	}
-    //构建adsCLient
+    //Создать adsCLient
 	stopChan := make(chan int)
 	sendControlChan := make(chan int)
 	recvControlChan := make(chan int)
